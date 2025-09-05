@@ -2,6 +2,7 @@ bin
 .idea
 .vscode
 dist/
+vendor/
 
 openfga
 !openfga/
