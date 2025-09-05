@@ -16,6 +16,7 @@ import (
 
 	"github.com/openfga/openfga/internal/build"
 	"github.com/openfga/openfga/pkg/logger"
+	"github.com/openfga/openfga/pkg/server/config"
 	"github.com/openfga/openfga/pkg/storage"
 	"github.com/openfga/openfga/pkg/telemetry"
 	"github.com/openfga/openfga/pkg/tuple"
@@ -61,12 +62,14 @@ func (c *CheckResponseCacheEntry) CacheEntityType() string {
 // delegating the request to some underlying CheckResolver.
 type CachedCheckResolver struct {
 	delegate CheckResolver
-	cache    storage.InMemoryCache[any]
+	cache    storage.Cache[any]
 	cacheTTL time.Duration
 	logger   logger.Logger
 	// allocatedCache is used to denote whether the cache is allocated by this struct.
 	// If so, CachedCheckResolver is responsible for cleaning up.
 	allocatedCache bool
+
+	cacheSettings *config.CacheSettings
 }
 
 var _ CheckResolver = (*CachedCheckResolver)(nil)
@@ -85,7 +88,7 @@ func WithCacheTTL(ttl time.Duration) CachedCheckResolverOpt {
 // WithExistingCache sets the cache to the specified cache.
 // Note that the original cache will not be stopped as it may still be used by others. It is up to the caller
 // to check whether the original cache should be stopped.
-func WithExistingCache(cache storage.InMemoryCache[any]) CachedCheckResolverOpt {
+func WithExistingCache(cache storage.Cache[any]) CachedCheckResolverOpt {
 	return func(ccr *CachedCheckResolver) {
 		ccr.cache = cache
 	}
@@ -95,6 +98,12 @@ func WithExistingCache(cache storage.InMemoryCache[any]) CachedCheckResolverOpt 
 func WithLogger(logger logger.Logger) CachedCheckResolverOpt {
 	return func(ccr *CachedCheckResolver) {
 		ccr.logger = logger
+	}
+}
+
+func WithResolverCacheSettings(settings config.CacheSettings) CachedCheckResolverOpt {
+	return func(ccr *CachedCheckResolver) {
+		ccr.cacheSettings = &settings
 	}
 }
 
@@ -116,14 +125,19 @@ func NewCachedCheckResolver(opts ...CachedCheckResolverOpt) (*CachedCheckResolve
 
 	if checker.cache == nil {
 		checker.allocatedCache = true
-		cacheOptions := []storage.InMemoryLRUCacheOpt[any]{
-			storage.WithMaxCacheSize[any](defaultMaxCacheSize),
-		}
 
-		var err error
-		checker.cache, err = storage.NewInMemoryLRUCache[any](cacheOptions...)
-		if err != nil {
-			return nil, err
+		if checker.cacheSettings != nil && checker.cacheSettings.CacheEngineType == config.CacheTypeRedis {
+			//TODO: check if each resolver must be identified uniquely
+			checker.cache = storage.NewRedisCache[any](checker.cacheSettings.RedisAddress, checker.cacheSettings.RedisPassword, "openfga:checkresolver:")
+		} else {
+			cacheOptions := []storage.InMemoryLRUCacheOpt[any]{
+				storage.WithMaxCacheSize[any](defaultMaxCacheSize),
+			}
+			var err error
+			checker.cache, err = storage.NewInMemoryLRUCache[any](cacheOptions...)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 

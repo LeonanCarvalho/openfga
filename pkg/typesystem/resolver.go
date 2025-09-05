@@ -35,7 +35,7 @@ func MemoizedTypesystemResolverFunc(datastore storage.AuthorizationModelReadBack
 	lookupGroup := singleflight.Group{}
 
 	// cache holds models that have already been validated.
-	cache, err := storage.NewInMemoryLRUCache[*TypeSystem]()
+	cache, err := storage.NewInMemoryLRUCache[*TypeSystem]() // We can keep in-memory here
 	if err != nil {
 		return nil, nil, err
 	}

@@ -54,44 +54,44 @@ func (mr *MockCacheItemMockRecorder) CacheEntityType() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheEntityType", reflect.TypeOf((*MockCacheItem)(nil).CacheEntityType))
 }
 
-// MockInMemoryCache is a mock of InMemoryCache interface.
-type MockInMemoryCache[T any] struct {
+// MockCache is a mock of Cache interface.
+type MockCache[T any] struct {
 	ctrl     *gomock.Controller
-	recorder *MockInMemoryCacheMockRecorder[T]
+	recorder *MockCacheMockRecorder[T]
 	isgomock struct{}
 }
 
-// MockInMemoryCacheMockRecorder is the mock recorder for MockInMemoryCache.
-type MockInMemoryCacheMockRecorder[T any] struct {
-	mock *MockInMemoryCache[T]
+// MockCacheMockRecorder is the mock recorder for MockCache.
+type MockCacheMockRecorder[T any] struct {
+	mock *MockCache[T]
 }
 
-// NewMockInMemoryCache creates a new mock instance.
-func NewMockInMemoryCache[T any](ctrl *gomock.Controller) *MockInMemoryCache[T] {
-	mock := &MockInMemoryCache[T]{ctrl: ctrl}
-	mock.recorder = &MockInMemoryCacheMockRecorder[T]{mock}
+// NewMockCache creates a new mock instance.
+func NewMockCache[T any](ctrl *gomock.Controller) *MockCache[T] {
+	mock := &MockCache[T]{ctrl: ctrl}
+	mock.recorder = &MockCacheMockRecorder[T]{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockInMemoryCache[T]) EXPECT() *MockInMemoryCacheMockRecorder[T] {
+func (m *MockCache[T]) EXPECT() *MockCacheMockRecorder[T] {
 	return m.recorder
 }
 
 // Delete mocks base method.
-func (m *MockInMemoryCache[T]) Delete(key string) {
+func (m *MockCache[T]) Delete(key string) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Delete", key)
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockInMemoryCacheMockRecorder[T]) Delete(key any) *gomock.Call {
+func (mr *MockCacheMockRecorder[T]) Delete(key any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockInMemoryCache[T])(nil).Delete), key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockCache[T])(nil).Delete), key)
 }
 
 // Get mocks base method.
-func (m *MockInMemoryCache[T]) Get(key string) T {
+func (m *MockCache[T]) Get(key string) T {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", key)
 	ret0, _ := ret[0].(T)
@@ -99,31 +99,31 @@ func (m *MockInMemoryCache[T]) Get(key string) T {
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockInMemoryCacheMockRecorder[T]) Get(key any) *gomock.Call {
+func (mr *MockCacheMockRecorder[T]) Get(key any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockInMemoryCache[T])(nil).Get), key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockCache[T])(nil).Get), key)
 }
 
 // Set mocks base method.
-func (m *MockInMemoryCache[T]) Set(key string, value T, ttl time.Duration) {
+func (m *MockCache[T]) Set(key string, value T, ttl time.Duration) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Set", key, value, ttl)
 }
 
 // Set indicates an expected call of Set.
-func (mr *MockInMemoryCacheMockRecorder[T]) Set(key, value, ttl any) *gomock.Call {
+func (mr *MockCacheMockRecorder[T]) Set(key, value, ttl any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*MockInMemoryCache[T])(nil).Set), key, value, ttl)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*MockCache[T])(nil).Set), key, value, ttl)
 }
 
 // Stop mocks base method.
-func (m *MockInMemoryCache[T]) Stop() {
+func (m *MockCache[T]) Stop() {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Stop")
 }
 
 // Stop indicates an expected call of Stop.
-func (mr *MockInMemoryCacheMockRecorder[T]) Stop() *gomock.Call {
+func (mr *MockCacheMockRecorder[T]) Stop() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stop", reflect.TypeOf((*MockInMemoryCache[T])(nil).Stop))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stop", reflect.TypeOf((*MockCache[T])(nil).Stop))
 }

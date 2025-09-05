@@ -30,13 +30,14 @@ func (c *cachedAuthorizationModel) CacheEntityType() string {
 type cachedOpenFGADatastore struct {
 	storage.OpenFGADatastore
 	lookupGroup singleflight.Group
-	cache       storage.InMemoryCache[*cachedAuthorizationModel]
+	cache       storage.Cache[*cachedAuthorizationModel]
 }
 
 // NewCachedOpenFGADatastore returns a wrapper over a datastore that caches up to maxSize
 // [*openfgav1.AuthorizationModel] on every call to storage.ReadAuthorizationModel.
 // It caches with unlimited TTL because models are immutable. It uses LRU for eviction.
 func NewCachedOpenFGADatastore(inner storage.OpenFGADatastore, maxSize int) (*cachedOpenFGADatastore, error) {
+	// TODO: Model could be cached on local as default, don't need redis here.
 	cache, err := storage.NewInMemoryLRUCache[*cachedAuthorizationModel](storage.WithMaxCacheSize[*cachedAuthorizationModel](int64(maxSize)))
 	if err != nil {
 		return nil, err

@@ -103,6 +103,8 @@ const (
 	DefaultPlannerInitialGuess      = 10 * time.Millisecond
 	DefaultPlannerEvictionThreshold = 0
 	DefaultPlannerCleanupInterval   = 0
+
+	DefaultCacheEngineType = "memory"
 )
 
 type DatastoreMetricsConfig struct {
@@ -300,6 +302,11 @@ type PlannerConfig struct {
 	CleanupInterval   time.Duration
 }
 
+type CacheEngine struct {
+	Type string // "in-memory" (default) or "redis"
+	// TODO Add Redis specific settings here (address, password, etc)
+}
+
 type Config struct {
 	// If you change any of these settings, please update the documentation at
 	// https://github.com/openfga/openfga.dev/blob/main/docs/content/intro/setup-openfga.mdx
@@ -409,6 +416,8 @@ type Config struct {
 
 	RequestDurationDatastoreQueryCountBuckets []string
 	RequestDurationDispatchCountBuckets       []string
+
+	CacheEngine CacheEngine
 }
 
 func (cfg *Config) Verify() error {
@@ -822,6 +831,9 @@ func DefaultConfig() *Config {
 			InitialGuess:      DefaultPlannerInitialGuess,
 			EvictionThreshold: DefaultPlannerEvictionThreshold,
 			CleanupInterval:   DefaultPlannerCleanupInterval,
+		},
+		CacheEngine: CacheEngine{
+			Type: DefaultCacheEngineType,
 		},
 	}
 }

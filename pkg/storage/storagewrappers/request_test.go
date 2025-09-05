@@ -24,7 +24,7 @@ func TestRequestStorageWrapper(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		t.Cleanup(ctrl.Finish)
 		mockDatastore := mocks.NewMockRelationshipTupleReader(ctrl)
-		mockCache := mocks.NewMockInMemoryCache[any](ctrl)
+		mockCache := mocks.NewMockCache[any](ctrl)
 
 		requestContextualTuples := []*openfgav1.TupleKey{
 			tuple.NewTupleKey("doc:1", "viewer", "user:maria"),
@@ -64,7 +64,7 @@ func TestRequestStorageWrapper(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		t.Cleanup(ctrl.Finish)
 		mockDatastore := mocks.NewMockRelationshipTupleReader(ctrl)
-		mockCache := mocks.NewMockInMemoryCache[any](ctrl)
+		mockCache := mocks.NewMockCache[any](ctrl)
 
 		requestContextualTuples := []*openfgav1.TupleKey{
 			tuple.NewTupleKey("doc:1", "viewer", "user:maria"),
@@ -163,7 +163,7 @@ func TestRequestStorageWrapper(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		t.Cleanup(ctrl.Finish)
 		mockDatastore := mocks.NewMockRelationshipTupleReader(ctrl)
-		mockCache := mocks.NewMockInMemoryCache[any](ctrl)
+		mockCache := mocks.NewMockCache[any](ctrl)
 
 		requestContextualTuples := []*openfgav1.TupleKey{
 			tuple.NewTupleKey("doc:1", "viewer", "user:maria"),
@@ -201,8 +201,8 @@ func TestRequestStorageWrapper(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		t.Cleanup(ctrl.Finish)
 		mockDatastore := mocks.NewMockRelationshipTupleReader(ctrl)
-		mockCache := mocks.NewMockInMemoryCache[any](ctrl)
-		shadowCache := mocks.NewMockInMemoryCache[any](ctrl)
+		mockCache := mocks.NewMockCache[any](ctrl)
+		shadowCache := mocks.NewMockCache[any](ctrl)
 
 		requestContextualTuples := []*openfgav1.TupleKey{
 			tuple.NewTupleKey("doc:1", "viewer", "user:maria"),

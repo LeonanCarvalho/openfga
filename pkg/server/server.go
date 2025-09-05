@@ -243,6 +243,9 @@ type Server struct {
 	singleflightGroup *singleflight.Group
 
 	planner *planner.Planner
+
+	// TODO: Set Redis Pool Here
+
 }
 
 type OpenFGAServiceV1Option func(s *Server)
@@ -830,6 +833,14 @@ func WithSharedIteratorTTL(ttl time.Duration) OpenFGAServiceV1Option {
 	}
 }
 
+// WithCacheEngineType set how the cache will be implemented.
+// Supported engines are "in-memory" and "redis". If not set, defaults to "in-memory".
+func WithCacheEngineType(engineType string) OpenFGAServiceV1Option {
+	return func(s *Server) {
+		s.cacheSettings.CacheEngineType = engineType
+	}
+}
+
 // NewServerWithOpts returns a new server.
 // You must call Close on it after you are done using it.
 func NewServerWithOpts(opts ...OpenFGAServiceV1Option) (*Server, error) {
@@ -1006,6 +1017,7 @@ func NewServerWithOpts(opts ...OpenFGAServiceV1Option) (*Server, error) {
 		}...),
 		graph.WithCachedCheckResolverOpts(s.cacheSettings.ShouldCacheCheckQueries(), checkCacheOptions...),
 		graph.WithDispatchThrottlingCheckResolverOpts(s.checkDispatchThrottlingEnabled, checkDispatchThrottlingOptions...),
+		graph.WithCacheSettings(s.cacheSettings), // TODO: Make a better way to inject redis
 	}...).Build()
 	if err != nil {
 		return nil, err
@@ -1031,6 +1043,7 @@ func NewServerWithOpts(opts ...OpenFGAServiceV1Option) (*Server, error) {
 		}...),
 		graph.WithCachedCheckResolverOpts(s.cacheSettings.ShouldCacheCheckQueries(), checkCacheOptions...),
 		graph.WithDispatchThrottlingCheckResolverOpts(s.checkDispatchThrottlingEnabled, checkDispatchThrottlingOptions...),
+		graph.WithCacheSettings(s.cacheSettings), // TODO: Make a better way to inject redis
 	}...).Build()
 	if err != nil {
 		return nil, err

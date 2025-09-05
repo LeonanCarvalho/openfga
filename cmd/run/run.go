@@ -53,6 +53,7 @@ import (
 	"github.com/openfga/openfga/internal/build"
 	authnmw "github.com/openfga/openfga/internal/middleware/authn"
 	"github.com/openfga/openfga/internal/planner"
+	"github.com/openfga/openfga/pkg/cachetypes"
 	"github.com/openfga/openfga/pkg/encoder"
 	"github.com/openfga/openfga/pkg/gateway"
 	"github.com/openfga/openfga/pkg/logger"
@@ -316,6 +317,7 @@ func NewRunCommand() *cobra.Command {
 	flags.Duration("planner-eviction-threshold", defaultConfig.Planner.EvictionThreshold, "how long a planner key can be unused before being evicted")
 	flags.Duration("planner-cleanup-interval", defaultConfig.Planner.CleanupInterval, "how often the planner checks for stale keys")
 
+	flags.String("cache-engine-type", defaultConfig.CacheEngine.Type, "the cache engine to use")
 	// NOTE: if you add a new flag here, update the function below, too
 
 	cmd.PreRun = bindRunFlagsFunc(flags)
@@ -467,6 +469,12 @@ func (s *ServerContext) datastoreConfig(config *serverconfig.Config) (storage.Op
 	}
 
 	s.Logger.Info(fmt.Sprintf("using '%v' storage engine", config.Datastore.Engine))
+
+	// TODO: init redis connection pool here
+	if config.CacheEngine.Type != "in-memory" {
+		s.Logger.Info(fmt.Sprintf("using '%v' cache engine", config.CacheEngine.Type))
+		cachetypes.RegisterCacheTypes()
+	}
 
 	return datastore, tokenSerializer, nil
 }
@@ -717,6 +725,7 @@ func (s *ServerContext) Run(ctx context.Context, config *serverconfig.Config) er
 		// The shared iterator watchdog timeout is set to config.RequestTimeout + 2 seconds
 		// to provide a small buffer for operations that might slightly exceed the request timeout.
 		server.WithSharedIteratorTTL(config.RequestTimeout+2*time.Second),
+		server.WithCacheEngineType(config.CacheEngine.Type),
 		server.WithExperimentals(experimentals...),
 		server.WithAccessControlParams(config.AccessControl.Enabled, config.AccessControl.StoreID, config.AccessControl.ModelID, config.Authn.Method),
 		server.WithContext(ctx),

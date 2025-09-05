@@ -54,8 +54,8 @@ type CacheItem interface {
 	CacheEntityType() string
 }
 
-// InMemoryCache is a general purpose cache to store things in memory.
-type InMemoryCache[T any] interface {
+// Cache is a general purpose cache to store things in memory or external systems (e.g., Redis).
+type Cache[T any] interface {
 	// Get If the key exists, returns the value. If the key didn't exist, returns nil.
 	Get(key string) T
 	Set(key string, value T, ttl time.Duration)
@@ -82,7 +82,7 @@ func WithMaxCacheSize[T any](maxElements int64) InMemoryLRUCacheOpt[T] {
 	}
 }
 
-var _ InMemoryCache[any] = (*InMemoryLRUCache[any])(nil)
+var _ Cache[any] = (*InMemoryLRUCache[any])(nil)
 
 func NewInMemoryLRUCache[T any](opts ...InMemoryLRUCacheOpt[T]) (*InMemoryLRUCache[T], error) {
 	t := &InMemoryLRUCache[T]{

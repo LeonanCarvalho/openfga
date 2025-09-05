@@ -37,7 +37,7 @@ func TestFindInCache(t *testing.T) {
 	mockController := gomock.NewController(t)
 	defer mockController.Finish()
 
-	mockCache := mocks.NewMockInMemoryCache[any](mockController)
+	mockCache := mocks.NewMockCache[any](mockController)
 	mockDatastore := mocks.NewMockOpenFGADatastore(mockController)
 
 	maxSize := 10
@@ -152,7 +152,7 @@ func TestReadStartingWithUser(t *testing.T) {
 	mockController := gomock.NewController(t)
 	defer mockController.Finish()
 
-	mockCache := mocks.NewMockInMemoryCache[any](mockController)
+	mockCache := mocks.NewMockCache[any](mockController)
 	mockDatastore := mocks.NewMockOpenFGADatastore(mockController)
 
 	maxSize := 10
@@ -422,7 +422,7 @@ func TestReadUsersetTuples(t *testing.T) {
 	mockController := gomock.NewController(t)
 	defer mockController.Finish()
 
-	mockCache := mocks.NewMockInMemoryCache[any](mockController)
+	mockCache := mocks.NewMockCache[any](mockController)
 	mockDatastore := mocks.NewMockOpenFGADatastore(mockController)
 
 	maxSize := 10
@@ -637,7 +637,7 @@ func TestRead(t *testing.T) {
 	mockController := gomock.NewController(t)
 	defer mockController.Finish()
 
-	mockCache := mocks.NewMockInMemoryCache[any](mockController)
+	mockCache := mocks.NewMockCache[any](mockController)
 	mockDatastore := mocks.NewMockOpenFGADatastore(mockController)
 
 	maxSize := 10
@@ -874,7 +874,7 @@ func TestDatastoreIteratorError(t *testing.T) {
 	mockController := gomock.NewController(t)
 	defer mockController.Finish()
 
-	mockCache := mocks.NewMockInMemoryCache[any](mockController)
+	mockCache := mocks.NewMockCache[any](mockController)
 	mockDatastore := mocks.NewMockOpenFGADatastore(mockController)
 
 	maxSize := 10
@@ -1277,7 +1277,7 @@ func TestCachedIterator(t *testing.T) {
 		mockController := gomock.NewController(t)
 		defer mockController.Finish()
 
-		mockCache := mocks.NewMockInMemoryCache[any](mockController)
+		mockCache := mocks.NewMockCache[any](mockController)
 		tupleRecord := &storage.TupleIteratorCacheEntry{
 			Tuples:       cachedTuples,
 			LastModified: time.Now().Add(-1 * time.Second),
@@ -1338,7 +1338,7 @@ func TestCachedIterator(t *testing.T) {
 		mockController := gomock.NewController(t)
 		defer mockController.Finish()
 
-		mockCache := mocks.NewMockInMemoryCache[any](mockController)
+		mockCache := mocks.NewMockCache[any](mockController)
 
 		gomock.InOrder(
 			mockCache.EXPECT().Get(cacheKey).Return(nil),
@@ -1400,7 +1400,7 @@ func TestCachedIterator(t *testing.T) {
 			mockController := gomock.NewController(t)
 			defer mockController.Finish()
 
-			mockCache := mocks.NewMockInMemoryCache[any](mockController)
+			mockCache := mocks.NewMockCache[any](mockController)
 
 			mockCache.EXPECT().Get(cacheKey).AnyTimes().Return(nil)
 			mockCache.EXPECT().Get(storage.GetInvalidIteratorCacheKey(store)).AnyTimes().Return(nil)

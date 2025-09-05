@@ -344,5 +344,9 @@ func bindRunFlagsFunc(flags *pflag.FlagSet) func(*cobra.Command, []string) {
 		util.MustBindEnv("planner.evictionThreshold", "OPENFGA_PLANNER_EVICTION_THRESHOLD")
 		util.MustBindPFlag("planner.cleanupInterval", flags.Lookup("planner-cleanup-interval"))
 		util.MustBindEnv("planner.cleanupInterval", "OPENFGA_PLANNER_CLEANUP_INTERVAL")
+
+		// TODO check how to make it experimental
+		util.MustBindPFlag("cacheEngine.type", flags.Lookup("cache-engine-type"))
+		util.MustBindEnv("cacheEngine.type", "OPENFGA_CACHE_ENGINE_TYPE")
 	}
 }

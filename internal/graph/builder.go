@@ -1,5 +1,9 @@
 package graph
 
+import (
+	"github.com/openfga/openfga/pkg/server/config"
+)
+
 type CheckResolverOrderedBuilder struct {
 	resolvers                              []CheckResolver
 	localCheckerOptions                    []LocalCheckerOption
@@ -10,6 +14,7 @@ type CheckResolverOrderedBuilder struct {
 	cachedCheckResolverOptions             []CachedCheckResolverOpt
 	dispatchThrottlingCheckResolverEnabled bool
 	dispatchThrottlingCheckResolverOptions []DispatchThrottlingCheckResolverOpt
+	settings                               *config.CacheSettings
 }
 
 type CheckResolverOrderedBuilderOpt func(checkResolver *CheckResolverOrderedBuilder)
@@ -55,6 +60,12 @@ func WithDispatchThrottlingCheckResolverOpts(enabled bool, opts ...DispatchThrot
 	}
 }
 
+func WithCacheSettings(settings config.CacheSettings) CheckResolverOrderedBuilderOpt {
+	return func(r *CheckResolverOrderedBuilder) {
+		r.settings = &settings
+	}
+}
+
 func NewOrderedCheckResolvers(opts ...CheckResolverOrderedBuilderOpt) *CheckResolverOrderedBuilder {
 	checkResolverBuilder := &CheckResolverOrderedBuilder{}
 	for _, opt := range opts {
@@ -74,7 +85,12 @@ func (c *CheckResolverOrderedBuilder) Build() (CheckResolver, CheckResolverClose
 	c.resolvers = []CheckResolver{}
 
 	if c.cachedCheckResolverEnabled {
-		cachedCheckResolver, err := NewCachedCheckResolver(c.cachedCheckResolverOptions...)
+		resolverOpt := c.cachedCheckResolverOptions
+		if c.settings != nil {
+			resolverOpt = append(resolverOpt, WithResolverCacheSettings(*c.settings))
+		}
+
+		cachedCheckResolver, err := NewCachedCheckResolver(resolverOpt...)
 		if err != nil {
 			return nil, nil, err
 		}

@@ -91,13 +91,13 @@ func WithLogger(logger logger.Logger) InMemoryCacheControllerOpt {
 	}
 }
 
-// InMemoryCacheController will invalidate cache iterator (InMemoryCache) and sub problem cache (CachedCheckResolver) entries
+// InMemoryCacheController will invalidate cache iterator (Cache) and sub problem cache (CachedCheckResolver) entries
 // that are more recent than the last write for the specified store.
 // Note that the invalidation is done asynchronously, and only after a Check request is received.
 // It will be eventually consistent.
 type InMemoryCacheController struct {
 	ds    storage.OpenFGADatastore
-	cache storage.InMemoryCache[any]
+	cache storage.Cache[any]
 
 	// ttl for the entry that keeps the last timestamp for a Write for a storeID.
 	ttl                   time.Duration
@@ -109,7 +109,7 @@ type InMemoryCacheController struct {
 	wg sync.WaitGroup
 }
 
-func NewCacheController(ds storage.OpenFGADatastore, cache storage.InMemoryCache[any], ttl time.Duration, iteratorCacheTTL time.Duration, opts ...InMemoryCacheControllerOpt) CacheController {
+func NewCacheController(ds storage.OpenFGADatastore, cache storage.Cache[any], ttl time.Duration, iteratorCacheTTL time.Duration, opts ...InMemoryCacheControllerOpt) CacheController {
 	c := &InMemoryCacheController{
 		ds:                    ds,
 		cache:                 cache,
