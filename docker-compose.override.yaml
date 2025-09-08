@@ -16,11 +16,16 @@ services:
       - OPENFGA_METRICS_ENABLE_RPC_HISTOGRAMS=true
       - OPENFGA_DATASTORE_METRICS_ENABLED=true
       - OPENFGA_METRICS_ENABLED=true
+      - OPENFGA_LOG_LEVEL=debug
+      - OPENFGA_CACHE_ENGINE_TYPE=redis
+      - OPENFGA_CACHE_CONTROLLER_ENABLED=true
+      - OPENFGA_CHECK_QUERY_CACHE_ENABLED=true
+      - OPENFGA_CHECK_ITERATOR_CACHE_ENABLED=true
 
   otel-collector:
     image: otel/opentelemetry-collector:latest
     container_name: otel-collector
-    command: [ "--config=/etc/otel-collector-config.yaml" ]
+    command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
       - "./telemetry/otel-collector-config.yaml:/etc/otel-collector-config.yaml"
     networks:
@@ -29,7 +34,7 @@ services:
   jaeger:
     image: jaegertracing/all-in-one:1.49
     container_name: jaeger
-    command: [ "--query.max-clock-skew-adjustment", "500ms" ]
+    command: ["--query.max-clock-skew-adjustment", "500ms"]
     environment:
       - COLLECTOR_OTLP_ENABLED=true
       - SPAN_STORAGE_TYPE=badger
@@ -55,9 +60,9 @@ services:
       - ./telemetry/prometheus:/etc/prometheus
       - prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
 
   grafana:
     image: grafana/grafana
@@ -73,7 +78,34 @@ services:
       - ./telemetry/grafana/dashboards:/etc/grafana/dashboards
       - grafana_data:/var/lib/grafana
 
+  redis:
+    image: redis:8
+    container_name: redis
+    networks:
+      - default
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis_data:/data
+
+  redisinsight:
+    image: redis/redisinsight
+    container_name: redis_insight
+    networks:
+      - default
+    ports:
+      - "8001:8001"
+      - "5540:5540"
+    depends_on:
+      - redis
+
 volumes:
   prometheus_data:
   grafana_data:
   jaeger_data:
+  redis_data:

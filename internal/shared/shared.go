@@ -43,9 +43,9 @@ type SharedDatastoreResources struct {
 	SingleflightGroup     *singleflight.Group
 	WaitGroup             *sync.WaitGroup
 	ServerCtx             context.Context
-	CheckCache            storage.InMemoryCache[any]
+	CheckCache            storage.Cache[any]
 	CacheController       cachecontroller.CacheController
-	ShadowCheckCache      storage.InMemoryCache[any]
+	ShadowCheckCache      storage.Cache[any]
 	ShadowCacheController cachecontroller.CacheController
 	Logger                logger.Logger
 	SharedIteratorStorage *sharediterator.Storage
@@ -71,11 +71,16 @@ func NewSharedDatastoreResources(
 
 	if settings.ShouldCreateNewCache() {
 		var err error
-		s.CheckCache, err = storage.NewInMemoryLRUCache([]storage.InMemoryLRUCacheOpt[any]{
-			storage.WithMaxCacheSize[any](int64(settings.CheckCacheLimit)),
-		}...)
-		if err != nil {
-			return nil, err
+		switch settings.CacheEngineType {
+		case serverconfig.CacheTypeRedis:
+			s.CheckCache = storage.NewRedisCache[any](settings.RedisAddress, settings.RedisPassword, "openfga:checks:")
+		default:
+			s.CheckCache, err = storage.NewInMemoryLRUCache([]storage.InMemoryLRUCacheOpt[any]{
+				storage.WithMaxCacheSize[any](int64(settings.CheckCacheLimit)),
+			}...)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -92,11 +97,16 @@ func NewSharedDatastoreResources(
 
 	if settings.ShouldCreateShadowNewCache() {
 		var err error
-		s.ShadowCheckCache, err = storage.NewInMemoryLRUCache([]storage.InMemoryLRUCacheOpt[any]{
-			storage.WithMaxCacheSize[any](int64(settings.CheckCacheLimit)),
-		}...)
-		if err != nil {
-			return nil, err
+		switch settings.CacheEngineType {
+		case serverconfig.CacheTypeRedis:
+			s.ShadowCheckCache = storage.NewRedisCache[any](settings.RedisAddress, settings.RedisPassword, "openfga:shadow:")
+		default:
+			s.ShadowCheckCache, err = storage.NewInMemoryLRUCache([]storage.InMemoryLRUCacheOpt[any]{
+				storage.WithMaxCacheSize[any](int64(settings.CheckCacheLimit)),
+			}...)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 

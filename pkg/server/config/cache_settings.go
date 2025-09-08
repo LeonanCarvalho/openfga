@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+const (
+	CacheTypeInMemory string = "memory"
+	CacheTypeRedis    string = "redis"
+)
+
 type CacheSettings struct {
 	CheckCacheLimit                    uint32
 	CacheControllerEnabled             bool
@@ -20,6 +25,10 @@ type CacheSettings struct {
 	SharedIteratorLimit                uint32
 	SharedIteratorTTL                  time.Duration
 	ShadowCheckCacheEnabled            bool
+
+	CacheEngineType string // "in-memory" (default) or "redis"
+	RedisAddress    string // Redis server address
+	RedisPassword   string // Redis password (optional)
 }
 
 func NewDefaultCacheSettings() CacheSettings {
@@ -39,6 +48,9 @@ func NewDefaultCacheSettings() CacheSettings {
 		SharedIteratorLimit:                DefaultSharedIteratorLimit,
 		SharedIteratorTTL:                  DefaultSharedIteratorTTL,
 		ShadowCheckCacheEnabled:            DefaultShadowCheckCacheEnabled,
+		CacheEngineType:                    DefaultCacheEngineType,
+		RedisAddress:                       "redis:6379", // TODO Make it configurable
+		RedisPassword:                      "",
 	}
 }
 

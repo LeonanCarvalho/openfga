@@ -89,7 +89,7 @@ type CachedDatastore struct {
 	storage.RelationshipTupleReader
 
 	ctx           context.Context
-	cache         storage.InMemoryCache[any]
+	cache         storage.Cache[any]
 	maxResultSize int
 	ttl           time.Duration
 
@@ -110,7 +110,7 @@ type CachedDatastore struct {
 func NewCachedDatastore(
 	ctx context.Context,
 	inner storage.RelationshipTupleReader,
-	cache storage.InMemoryCache[any],
+	cache storage.Cache[any],
 	maxSize int,
 	ttl time.Duration,
 	sf *singleflight.Group,
@@ -243,7 +243,7 @@ func (c *CachedDatastore) Read(
 		tupleKey.GetRelation())
 }
 
-func isInvalidAt(cache storage.InMemoryCache[any], ts time.Time, invalidStore string, invalidEntityKeys []string) bool {
+func isInvalidAt(cache storage.Cache[any], ts time.Time, invalidStore string, invalidEntityKeys []string) bool {
 	if res := cache.Get(invalidStore); res != nil {
 		invalidEntry, ok := res.(*storage.InvalidEntityCacheEntry)
 		// if the invalid entity is not valid, do not discard
@@ -269,7 +269,7 @@ func isInvalidAt(cache storage.InMemoryCache[any], ts time.Time, invalidStore st
 // the key is present, and
 // the cache key satisfies TS(key) >= TS(store), and
 // all of the invalidEntityKeys satisfy TS(key) >= TS(invalid).
-func findInCache(cache storage.InMemoryCache[any], key, storeKey string, invalidEntityKeys []string) (*storage.TupleIteratorCacheEntry, bool) {
+func findInCache(cache storage.Cache[any], key, storeKey string, invalidEntityKeys []string) (*storage.TupleIteratorCacheEntry, bool) {
 	var tupleEntry *storage.TupleIteratorCacheEntry
 	var ok bool
 
@@ -405,7 +405,7 @@ type cachedIterator struct {
 	cacheKey          string
 	invalidStoreKey   string
 	invalidEntityKeys []string
-	cache             storage.InMemoryCache[any]
+	cache             storage.Cache[any]
 	ttl               time.Duration
 	initializedAt     time.Time
 
